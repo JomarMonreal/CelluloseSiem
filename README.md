@@ -1,6 +1,6 @@
 # Cellulose SIEM
 
-A small security monitor for the [Cellulose server](../CelluloseServer). It runs beside the server as its own
+A small security monitor for the Cellulose server. It runs beside the server as its own
 service, reads the server's security events from journald, raises alerts on attacks and outages, and keeps every
 event in a local SQLite database. A dashboard on port 4100 shows it all, to this machine and, with a password, to
 your other devices on the home network.
