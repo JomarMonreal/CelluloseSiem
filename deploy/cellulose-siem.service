@@ -15,20 +15,22 @@ SupplementaryGroups=systemd-journal
 # the database: /var/lib/cellulose-siem/siem.db (sudo to read it), kept across restarts and reboots
 StateDirectory=cellulose-siem
 StateDirectoryMode=0700
-# your home is private, so the code and Node are mounted, read-only, where this user can reach them
-BindReadOnlyPaths=/home/noromon/cellulose/CelluloseSiem:/opt/cellulose-siem
-BindReadOnlyPaths=/home/noromon/.nvm/versions/node/v22.21.1:/opt/cellulose-siem-node
+# your home is private, so the code and Node are mounted, read-only, where this user can reach them.
+# Fill in YOUR_USER, the folders and your Node version (`dirname $(dirname $(which node))` gives the Node folder)
+BindReadOnlyPaths=/home/YOUR_USER/cellulose/CelluloseSiem:/opt/cellulose-siem
+BindReadOnlyPaths=/home/YOUR_USER/.nvm/versions/node/vNODE_VERSION:/opt/cellulose-siem-node
 # the game server's folder, at its real path, so its code and .env are watched for changes (read-only; .env itself
 # stays unreadable to this user, but a change to it still shows)
-BindReadOnlyPaths=/home/noromon/cellulose/CelluloseServer
-Environment=SERVER_DIR=/home/noromon/cellulose/CelluloseServer
+BindReadOnlyPaths=/home/YOUR_USER/cellulose/CelluloseServer
+Environment=SERVER_DIR=/home/YOUR_USER/cellulose/CelluloseServer
 WorkingDirectory=/opt/cellulose-siem
 Environment=NODE_ENV=production
 Environment=PUBLIC_HEALTH_URL=https://api.cellulose.lol/health
 # the dashboard, for devices on your home Wi-Fi: every address of this machine, so a new one from the router still
-# works, but only the home network may connect, and only with SIEM_PASSWORD
+# works, but only the home network may connect, and only with SIEM_PASSWORD. Set SIEM_ALLOW to your home
+# network's subnet (`ip -4 addr` shows it, e.g. inet 192.168.1.23/24 means 192.168.1.0/24)
 Environment=SIEM_HOST=0.0.0.0
-Environment=SIEM_ALLOW=192.168.18.0/24
+Environment=SIEM_ALLOW=192.168.1.0/24
 # SIEM_PASSWORD (required), NOTIFY_URL and anything else from config.ts; keep it readable by root only
 EnvironmentFile=/etc/cellulose-siem.env
 ExecStart=/opt/cellulose-siem-node/bin/node --disable-warning=ExperimentalWarning dist/index.js

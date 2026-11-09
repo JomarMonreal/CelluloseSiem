@@ -7,7 +7,7 @@ const env = (name: string, fallback: number) => {
 /** The dashboard. It shows players' IPs and usernames, so keep it to this machine or your own network. */
 export const PORT = env("SIEM_PORT", 4100);
 export const HOST = process.env.SIEM_HOST ?? "127.0.0.1";
-/** Who else may connect: comma-separated addresses or subnets, e.g. 192.168.18.0/24. This machine always may. */
+/** Who else may connect: comma-separated addresses or subnets, e.g. 192.168.1.0/24. This machine always may. */
 export const ALLOW = (process.env.SIEM_ALLOW ?? "")
   .split(",")
   .map((s) => s.trim())

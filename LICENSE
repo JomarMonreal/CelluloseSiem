@@ -1,0 +1,12 @@
+Copyright (c) 2026 Jomar Monreal (Noromon Studio). All rights reserved.
+
+This repository is published so that its source can be read. No license is granted to use it.
+
+You may view this repository on GitHub, and fork it there, only as GitHub's Terms of Service allow. You may not
+copy, modify, merge, publish, distribute, host, sublicense or sell this software or any part of it, or make works
+based on it, without prior written permission from the copyright holder.
+
+Third-party dependencies (in package.json) are not covered by this notice. Each remains under its own
+license.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.

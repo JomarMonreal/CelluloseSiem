@@ -101,7 +101,7 @@ Environment variables, set in the unit or in `/etc/cellulose-siem.env`:
 | Variable | Default | |
 |---|---|---|
 | `SIEM_PORT`, `SIEM_HOST` | `4100`, `127.0.0.1` | The dashboard. The unit uses `0.0.0.0` (every address), so it keeps working when the router hands out a new one |
-| `SIEM_ALLOW` | none (the unit sets `192.168.18.0/24`) | Other addresses or subnets that may connect, comma-separated. This machine always may |
+| `SIEM_ALLOW` | none (the unit sets your home subnet, e.g. `192.168.1.0/24`) | Other addresses or subnets that may connect, comma-separated. This machine always may |
 | `SIEM_PASSWORD` | none | The dashboard's password. Required when `SIEM_HOST` or `SIEM_ALLOW` let other machines in; it won't start without one |
 | `SIEM_UNIT` | `cellulose-server.service` | The unit to watch |
 | `LOCAL_HEALTH_URL` | `http://127.0.0.1:3000/health` | |
@@ -147,3 +147,7 @@ programs, so filling the disk can't be used to erase what it recorded.
   pages. It only answers addresses in `SIEM_ALLOW`, makes an address wait after 10 wrong passwords in 10 minutes,
   refuses requests by hostname (DNS rebinding) and cross-site writes, and sessions last 30 days (or until the SIEM
   restarts). Without `SIEM_PASSWORD` it stays on 127.0.0.1, where any program on this machine can read it.
+
+## License
+
+All rights reserved; see [LICENSE](LICENSE). The source is here to read, not to reuse. Ask if you'd like to use any of it.

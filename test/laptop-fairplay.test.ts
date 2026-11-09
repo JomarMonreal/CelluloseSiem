@@ -24,35 +24,35 @@ const rules = (events: NewEvent[]) => run(events).alerts.map((a) => a.rule);
 // the laptop, from lines as this laptop's journal has them
 
 test("reads the laptop's log lines that matter, and drops the rest", () => {
-  const sudo = fromHost(host("sudo", "noromon : TTY=/dev/pts/8 ; PWD=/home/noromon ; USER=root ; COMMAND=/usr/bin/systemctl restart cellulose-siem"))!;
-  assert.deepEqual([sudo.evt, sudo.username, sudo.fields.as, sudo.fields.command], ["sudo_command", "noromon", "root", "/usr/bin/systemctl restart cellulose-siem"]);
-  const streak = fromHost(host("sudo", "noromon : 3 incorrect password attempts ; TTY=/dev/pts/6 ; PWD=/home/noromon ; USER=root ; COMMAND=/usr/bin/ls"))!;
+  const sudo = fromHost(host("sudo", "alice : TTY=/dev/pts/8 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/systemctl restart cellulose-siem"))!;
+  assert.deepEqual([sudo.evt, sudo.username, sudo.fields.as, sudo.fields.command], ["sudo_command", "alice", "root", "/usr/bin/systemctl restart cellulose-siem"]);
+  const streak = fromHost(host("sudo", "alice : 3 incorrect password attempts ; TTY=/dev/pts/6 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/ls"))!;
   assert.deepEqual([streak.evt, streak.fields.attempts], ["sudo_denied", 3]);
-  assert.equal(fromHost(host("sudo", "pam_unix(sudo:session): session opened for user root(uid=0) by noromon(uid=1000)")), null);
-  assert.equal(fromHost(host("sudo", "pam_unix(sudo:auth): authentication failure; logname=noromon uid=1000 euid=0 tty=/dev/pts/6 ruser=noromon rhost=  user=noromon")), null);
-  assert.equal(fromHost(host("unix_chkpwd", "password check failed for user (noromon)"))!.evt, "local_auth_fail");
+  assert.equal(fromHost(host("sudo", "pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1000)")), null);
+  assert.equal(fromHost(host("sudo", "pam_unix(sudo:auth): authentication failure; logname=alice uid=1000 euid=0 tty=/dev/pts/6 ruser=alice rhost=  user=alice")), null);
+  assert.equal(fromHost(host("unix_chkpwd", "password check failed for user (alice)"))!.evt, "local_auth_fail");
   const user = fromHost(host("useradd", "new user: name=wazuh, UID=106, GID=127, home=/var/ossec, shell=/sbin/nologin, from=none"))!;
   assert.deepEqual([user.evt, user.username, user.fields.uid], ["user_added", "wazuh", 106]);
   assert.equal(fromHost(host("usermod", "add 'mallory' to group 'sudo'"))!.fields.group, "sudo");
   assert.equal(fromHost(host("usermod", "add 'mallory' to shadow group 'sudo'")), null);
   assert.equal(fromHost(host("systemd-logind", "The system will suspend now!"))!.evt, "laptop_sleep");
-  assert.equal(fromHost(host("systemd-logind", "New session '3' of user 'noromon' with class 'user' and type 'wayland'."))!.username, "noromon");
+  assert.equal(fromHost(host("systemd-logind", "New session '3' of user 'alice' with class 'user' and type 'wayland'."))!.username, "alice");
   assert.equal(fromHost(host("systemd-logind", "New session '1' of user 'sddm' with class 'greeter' and type 'wayland'.")), null);
   assert.equal(fromHost(host("cloudflared", '2026-11-02T12:51:25Z ERR Connection terminated error="failed to dial to edge with quic: timeout" connIndex=1'))!.evt, "tunnel_drop");
   assert.equal(fromHost(host("cloudflared", "2026-11-02T12:51:25Z INF Registered tunnel connection connIndex=3 location=hk"))!.fields.location, "hk");
-  const ssh = fromHost(host("sshd-session", "Accepted publickey for noromon from 192.168.18.20 port 51234 ssh2: ED25519 SHA256:x"))!;
-  assert.deepEqual([ssh.evt, ssh.username, ssh.srcip], ["ssh_login", "noromon", "192.168.18.20"]);
+  const ssh = fromHost(host("sshd-session", "Accepted publickey for alice from 192.168.1.20 port 51234 ssh2: ED25519 SHA256:x"))!;
+  assert.deepEqual([ssh.evt, ssh.username, ssh.srcip], ["ssh_login", "alice", "192.168.1.20"]);
   assert.equal(fromHost(host("sshd", "Failed password for invalid user admin from 203.0.113.9 port 4444 ssh2"))!.username, "admin");
   assert.equal(fromHost(host("kernel", "Out of memory: Killed process 4242 (node) total-vm:1234kB"))!.fields.process, "node");
   assert.equal(fromHost(host("kernel", "wlp3s0: associated")), null);
 });
 
 test("laptop rules: wrong passwords, new users, admin rights, sleep", () => {
-  const wrong = (i: number) => fromHost(host("unix_chkpwd", "password check failed for user (noromon)", T0 + i * MIN))!;
+  const wrong = (i: number) => fromHost(host("unix_chkpwd", "password check failed for user (alice)", T0 + i * MIN))!;
   assert.deepEqual(rules([wrong(0), wrong(1)]), []);
   assert.deepEqual(rules([wrong(0), wrong(1), wrong(2)]), ["laptop-password-guessing"]);
   // a typo streak's summary line doesn't raise a second alert
-  const streak = fromHost(host("sudo", "noromon : 3 incorrect password attempts ; TTY=/dev/pts/6 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/ls", T0 + 3 * MIN))!;
+  const streak = fromHost(host("sudo", "alice : 3 incorrect password attempts ; TTY=/dev/pts/6 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/ls", T0 + 3 * MIN))!;
   assert.deepEqual(rules([wrong(0), wrong(1), wrong(2), streak]), ["laptop-password-guessing"]);
   assert.deepEqual(rules([fromHost(host("useradd", "new user: name=x, UID=1001, GID=1001, home=/home/x, shell=/bin/bash, from=none"))!]), ["new-system-user"]);
   assert.deepEqual(rules([fromHost(host("usermod", "add 'x' to group 'sudo'"))!]), ["admin-group"]);
