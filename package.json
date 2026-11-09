@@ -1,0 +1,23 @@
+{
+  "name": "cellulose-siem",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A small SIEM for the Cellulose server: reads its security events from journald, raises alerts, keeps the records locally",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "tsx watch --disable-warning=ExperimentalWarning src/index.ts",
+    "build": "tsc",
+    "start": "node --disable-warning=ExperimentalWarning dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --disable-warning=ExperimentalWarning --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.0"
+  }
+}

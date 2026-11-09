@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in · Cellulose SIEM</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="login">
+    <form method="post" action="/login">
+      <h1>Cellulose SIEM</h1>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" autofocus required />
+      <p class="note" role="alert">{{note}}</p>
+      <button type="submit">Sign in</button>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cellulose SIEM</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">Cellulose SIEM</div>
+      <div id="chips" class="chips" aria-live="polite"></div>
+      <form id="signout" method="post" action="/logout" hidden><button type="submit" class="quiet">Sign out</button></form>
+    </header>
+
+    <main>
+      <section id="verdict" class="verdict" aria-live="polite">
+        <div class="verdict-icon" id="verdict-icon"></div>
+        <div>
+          <h1 id="verdict-title">Loading…</h1>
+          <p id="verdict-text"></p>
+        </div>
+      </section>
+
+      <section class="panel" id="digest-panel">
+        <div class="panel-head">
+          <h2>Daily summary</h2>
+          <span id="digest-day" class="when"></span>
+        </div>
+        <div id="digest"></div>
+        <details id="digest-older" class="table-view" hidden>
+          <summary>Earlier days</summary>
+          <div id="digest-list"></div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Alerts</h2>
+          <div class="row">
+            <label class="toggle"><input type="checkbox" id="show-handled" /> Show handled</label>
+            <button id="handle-all" type="button" class="quiet">Mark all handled</button>
+          </div>
+        </div>
+        <div id="alerts" class="cards"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Activity, last 24 hours</h2>
+          <div id="legend" class="legend"></div>
+        </div>
+        <div id="chart-wrap">
+          <div id="chart" class="chart"></div>
+          <div id="tooltip" class="tooltip" role="status" hidden></div>
+        </div>
+        <details class="table-view">
+          <summary>Show as table</summary>
+          <table>
+            <thead><tr><th>Hour</th><th class="num">Normal</th><th class="num">Failed sign-ins</th><th class="num">Blocked or suspicious</th></tr></thead>
+            <tbody id="chart-table"></tbody>
+          </table>
+        </details>
+      </section>
+
+      <div class="split">
+        <section class="panel">
+          <div class="panel-head"><h2>Most active IPs, last 24 hours</h2></div>
+          <ul id="ips" class="list"></ul>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Health</h2></div>
+          <ul id="health" class="list"></ul>
+        </section>
+      </div>
+
+      <section class="panel" id="log">
+        <div class="panel-head">
+          <h2>Activity log</h2>
+          <form id="search" class="row" role="search">
+            <input id="q" type="search" placeholder="Search IP, username, text" aria-label="Search the activity log" />
+          </form>
+        </div>
+        <div id="filters" class="filters" role="group" aria-label="Show"></div>
+        <div id="who" class="who" hidden></div>
+        <ul id="events" class="list events"></ul>
+        <button id="older" type="button" class="quiet wide" hidden>Show older</button>
+      </section>
+    </main>
+  </body>
+</html>

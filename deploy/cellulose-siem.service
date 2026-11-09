@@ -1,0 +1,57 @@
+# systemd unit for the SIEM, on the same machine as cellulose-server. Install (the README has the steps):
+#   sudo cp deploy/cellulose-siem.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now cellulose-siem
+[Unit]
+Description=Cellulose SIEM (watches cellulose-server)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# a throwaway user of its own, made fresh each start: the game server runs as you, so even taken over it can't
+# stop this process or touch its records. It reads the journal through the systemd-journal group.
+DynamicUser=yes
+SupplementaryGroups=systemd-journal
+# the database: /var/lib/cellulose-siem/siem.db (sudo to read it), kept across restarts and reboots
+StateDirectory=cellulose-siem
+StateDirectoryMode=0700
+# your home is private, so the code and Node are mounted, read-only, where this user can reach them
+BindReadOnlyPaths=/home/noromon/cellulose/CelluloseSiem:/opt/cellulose-siem
+BindReadOnlyPaths=/home/noromon/.nvm/versions/node/v22.21.1:/opt/cellulose-siem-node
+# the game server's folder, at its real path, so its code and .env are watched for changes (read-only; .env itself
+# stays unreadable to this user, but a change to it still shows)
+BindReadOnlyPaths=/home/noromon/cellulose/CelluloseServer
+Environment=SERVER_DIR=/home/noromon/cellulose/CelluloseServer
+WorkingDirectory=/opt/cellulose-siem
+Environment=NODE_ENV=production
+Environment=PUBLIC_HEALTH_URL=https://api.cellulose.lol/health
+# the dashboard, for devices on your home Wi-Fi: every address of this machine, so a new one from the router still
+# works, but only the home network may connect, and only with SIEM_PASSWORD
+Environment=SIEM_HOST=0.0.0.0
+Environment=SIEM_ALLOW=192.168.18.0/24
+# SIEM_PASSWORD (required), NOTIFY_URL and anything else from config.ts; keep it readable by root only
+EnvironmentFile=/etc/cellulose-siem.env
+ExecStart=/opt/cellulose-siem-node/bin/node --disable-warning=ExperimentalWarning dist/index.js
+Restart=always
+RestartSec=5
+# sandboxing: DynamicUser already gives a read-only system, private /tmp and no privileges; this tightens the rest
+ProtectHome=tmpfs
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
